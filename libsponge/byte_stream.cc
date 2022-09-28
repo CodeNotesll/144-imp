@@ -19,6 +19,8 @@ ByteStream::ByteStream(const size_t capacity) : buffer_capacity(capacity), input
 }
 
 size_t ByteStream::write(const string &data) {
+    if (input_ended())
+        return 0;  //
     size_t to_write = min(remaining_capacity(), data.size());
     for (size_t i = 0; i < to_write; ++i) {
         que.push(data[i]);

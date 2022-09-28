@@ -78,10 +78,10 @@ class ByteStream {
     //! \name General accounting
     //!@{
 
-    //! Total number of bytes written
+    // Total number of bytes written
     size_t bytes_written() const;
 
-    //! Total number of bytes popped
+    // Total number of bytes popped
     size_t bytes_read() const;
     //!@}
 };
