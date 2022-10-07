@@ -43,7 +43,9 @@ int main() {
             string d(offset, 0);
             generate(d.begin(), d.end(), [&] { return rd(); });
 
-            for (auto [off, sz] : seq_size) {
+            for (const auto& vec : seq_size) {
+                size_t off = std::get<0>(vec);
+                size_t sz  = std::get<1>(vec); 
                 string dd(d.cbegin() + off, d.cbegin() + off + sz);
                 buf.push_substring(move(dd), off, off + sz == offset);
             }

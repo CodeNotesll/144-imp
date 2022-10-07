@@ -96,6 +96,34 @@ int main() {
             test.execute(BytesAvailable{"bcdefghi"});
             test.execute(AtEof{});
         }
+        {
+            ReassemblerTestHarness test{16};
+
+            test.execute(SubmitSegment{"a", 0});
+            test.execute(BytesAssembled(1));
+            test.execute(BytesAvailable("a"));
+            test.execute(NotAtEof{});
+
+            test.execute(SubmitSegment{"bc", 1});
+            test.execute(BytesAssembled(3));
+            test.execute(BytesAvailable("bc"));
+            test.execute(NotAtEof{});
+
+            test.execute(SubmitSegment{"ghi", 19});
+            test.execute(BytesAssembled(3));
+            test.execute(NotAtEof{});
+
+            test.execute(SubmitSegment{"cdefg", 8}.with_eof(true));
+            test.execute(BytesAssembled(3));
+            test.execute(BytesAvailable{""});
+            test.execute(NotAtEof{});
+
+            test.execute(SubmitSegment{"cdefg", 3});
+            test.execute(BytesAssembled(13));
+            test.execute(BytesAvailable{"cdefgcdefg"});
+            test.execute(AtEof{});
+
+        }
 
         {
             ReassemblerTestHarness test{3};
