@@ -35,6 +35,9 @@ WrappingInt32 wrap(uint64_t n, WrappingInt32 isn);
 //! has a different ISN.
 uint64_t unwrap(WrappingInt32 n, WrappingInt32 isn, uint64_t checkpoint);
 
+
+
+
 //! \name Helper functions
 //!@{
 
@@ -59,7 +62,7 @@ inline std::ostream &operator<<(std::ostream &os, WrappingInt32 a) { return os <
 inline WrappingInt32 operator+(WrappingInt32 a, uint32_t b) { return WrappingInt32{a.raw_value() + b}; }
 
 //! \brief The point `b` steps before `a`.
-inline WrappingInt32 operator-(WrappingInt32 a, uint32_t b) { return a + -b; }
+inline WrappingInt32 operator-(WrappingInt32 a, uint32_t b) { return a + -b; } // call '+' operator
 //!@}
 
 #endif  // SPONGE_LIBSPONGE_WRAPPING_INTEGERS_HH
