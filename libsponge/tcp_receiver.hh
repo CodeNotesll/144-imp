@@ -19,6 +19,10 @@ class TCPReceiver {
 
     //! The maximum number of bytes we'll store.
     size_t _capacity;
+    WrappingInt32 isn{0};  // isn wrapped seqno
+    WrappingInt32 fin{0};  // fin wrappen seqno
+    bool has_isn = false;
+    bool has_fin = false;
 
   public:
     //! \brief Construct a TCP receiver

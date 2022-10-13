@@ -14,7 +14,7 @@ void DUMMY_CODE(Targs &&... /* unused */) {}
 using namespace std;
 
 StreamReassembler::StreamReassembler(const size_t capacity)
-    : unassembled_num(0), eof_index(-1), _eof(false), _output(capacity), _capacity(capacity) {}
+    : unassembled_num(0), eof_index(0), _eof(false), _output(capacity), _capacity(capacity) {}
 
 //! \brief this fucntion sotre an string in an index-sorted map
 //! the <index, string> pair in map has such compareable relation
@@ -89,14 +89,17 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
     if (_output.input_ended())  // input has ended
         return;
     if (eof) {
+        _eof = eof;
         eof_index = index + data.size();
     }
     size_t expectedIndex = _output.bytes_written();  // index of unwriten byte in datastream
-    if (data.size() == 0 && expectedIndex == eof_index) {
+    if (_eof && data.size() == 0 && expectedIndex == eof_index) {
         _output.end_input();
     }
     uint64_t bytes_read = _output.bytes_read();  // index of unread byte in datastream
     uint64_t unaccept_index = bytes_read + _capacity;
+    // another representation:
+    // uint64_t unaccept_index = expectedIndex + _output.remaining_capacity();
     if (unaccept_index <= index)  // data's index greater than right side of window(buffer), ignored
         return;
 
@@ -130,7 +133,7 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
     mp.erase(beg);
     unassembled_num -= temp.size();
     expectedIndex = _output.bytes_written();
-    if (expectedIndex == eof_index)
+    if (_eof && expectedIndex == eof_index)
         _output.end_input();
     return;
 }
