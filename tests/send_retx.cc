@@ -40,6 +40,7 @@ int main() {
             test.execute(ExpectState{TCPSenderStateSummary::SYN_SENT});
             test.execute(ExpectBytesInFlight{1});
             test.execute(AckReceived{WrappingInt32{isn + 1}});
+            test.execute(ExpectNoSegment{}); 
             test.execute(ExpectState{TCPSenderStateSummary::SYN_ACKED});
             test.execute(ExpectBytesInFlight{0});
         }

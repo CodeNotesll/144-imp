@@ -104,7 +104,9 @@ int main() {
 
             TCPSenderTestHarness test{"Window filling", cfg};
             test.execute(ExpectSegment{}.with_no_flags().with_syn(true).with_payload_size(0).with_seqno(isn));
+            test.execute(ExpectBytesInFlight{1});
             test.execute(AckReceived{WrappingInt32{isn + 1}}.with_win(3));
+            test.execute(ExpectBytesInFlight{0});
             test.execute(ExpectState{TCPSenderStateSummary::SYN_ACKED});
             test.execute(WriteBytes("01234567"));
             test.execute(ExpectBytesInFlight{3});
@@ -135,9 +137,9 @@ int main() {
             test.execute(ExpectSegment{}.with_no_flags().with_syn(true).with_payload_size(0).with_seqno(isn));
             test.execute(AckReceived{WrappingInt32{isn + 1}}.with_win(3));
             test.execute(ExpectState{TCPSenderStateSummary::SYN_ACKED});
-            test.execute(WriteBytes("01"));
+            test.execute(WriteBytes("01")); // line 441,test execute out_put() after steps.execute(...)
             test.execute(ExpectBytesInFlight{2});
-            test.execute(ExpectSegment{}.with_data("01"));
+            test.execute(ExpectSegment{}.with_no_flags().with_syn(false).with_data("01"));
             test.execute(ExpectNoSegment{});
             test.execute(ExpectSeqno{WrappingInt32{isn + 1 + 2}});
             test.execute(WriteBytes("23"));
