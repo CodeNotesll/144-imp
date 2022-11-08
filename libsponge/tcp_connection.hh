@@ -20,7 +20,16 @@ class TCPConnection {
     //! for 10 * _cfg.rt_timeout milliseconds after both streams have ended,
     //! in case the remote TCPConnection doesn't know we've received its whole stream?
     bool _linger_after_streams_finish{true};
+    size_t alive_time{0};
+    size_t segment_received_time{0};
 
+    //! send rst segment when consecutive retranmission time > upperbound or 
+    // ( active() == true when destructor called)
+    void send_rst();
+
+    //! push all segments in _sender.segments_out() to _segment_out 
+    //! plus proper win and ackno
+    void send_all_segments();
   public:
     //! \name "Input" interface for the writer
     //!@{
