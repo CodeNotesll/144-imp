@@ -39,7 +39,7 @@ uint64_t unwrap(WrappingInt32 n, WrappingInt32 isn, uint64_t checkpoint) {
     uint32_t t = checkpoint/m;
     uint32_t remain = checkpoint%m;
     uint64_t left, right;
-    if(t == 0 && remain <= k) {
+    if (t == 0 && remain <= k) {
         return k;
     }
     if (t == m - 1 && k <= remain) {

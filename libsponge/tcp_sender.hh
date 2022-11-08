@@ -19,7 +19,12 @@ class timer {
   public:
     timer() : start_time(0), expire_time(0), stall(true) {}
 
-    void run(size_t _start, size_t _expire);
+    void run(size_t _start, size_t _expire) {
+      stall = false;
+      this->expire_time = _expire;
+      this->start_time = _start;
+      return;
+    }
 
     void stop() { stall = true; }
 
@@ -52,14 +57,8 @@ class TCPSender {
     //! the (absolute) sequence number for the next byte to be sent
     uint64_t _next_seqno{0};
 
-    //! keep track of window size
-    size_t win_size;
-
     //! time that Tcpsender has been alive
     size_t alive_time;
-
-    //! numbers are occupied by segments sent but not yet acknowledged
-    uint64_t bytes_not_acked;
 
     //! retransmission time for connection
     unsigned int wait_time;
@@ -73,6 +72,14 @@ class TCPSender {
 
     bool fin_sent;
 
+    //! \brief variable used for flow and congestion control
+    //!@{
+    
+    //! advertised receiver's window 
+    uint16_t rwnd;
+    size_t LastByteSent;
+    size_t LastByteAcked;
+    //!@}
   public:
     //! Initialize a TCPSender
     TCPSender(const size_t capacity = TCPConfig::DEFAULT_CAPACITY,
@@ -128,6 +135,9 @@ class TCPSender {
     //! \brief relative seqno for the next byte to be sent
     WrappingInt32 next_seqno() const { return wrap(_next_seqno, _isn); }
     //!@}
+    bool has_fin_sent() const {
+      return fin_sent;
+    }
 };
 
 #endif  // SPONGE_LIBSPONGE_TCP_SENDER_HH

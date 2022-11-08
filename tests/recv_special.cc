@@ -112,6 +112,7 @@ int main() {
                              .with_data("oodbye, CS144!")
                              .with_seqno(isn + 2)
                              .with_result(SegmentArrives::Result::OK));
+            test.execute(ExpectUnassembledBytes(14));
             test.execute(ExpectState{TCPReceiverStateSummary::SYN_RECV});
             test.execute(ExpectBytes{""});
             test.execute(ExpectAckno{WrappingInt32{isn + 1}});

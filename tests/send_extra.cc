@@ -173,7 +173,6 @@ int main() {
 
             for (unsigned int i = 0; i + TCPConfig::MAX_PAYLOAD_SIZE < min(bigstring.size(), window_size);
                  i += TCPConfig::MAX_PAYLOAD_SIZE) {
-                    //cout << "i is " << i << endl;
                 const size_t expected_size = min(TCPConfig::MAX_PAYLOAD_SIZE, min(bigstring.size(), window_size) - i);
                 test.execute(ExpectSegment{}
                                  .with_no_flags()
@@ -230,28 +229,29 @@ int main() {
             test.execute(ExpectSegment{}.with_payload_size(0).with_seqno(isn + 4).with_fin(true));
         }
 
-        // {
-        //     TCPConfig cfg;
-        //     WrappingInt32 isn(rd());
-        //     const size_t rto = uniform_int_distribution<uint16_t>{30, 10000}(rd);
-        //     cfg.fixed_isn = isn;
-        //     cfg.rt_timeout = rto;
+        {
+            TCPConfig cfg;
+            WrappingInt32 isn(rd());
+            const size_t rto = uniform_int_distribution<uint16_t>{30, 10000}(rd);
+            cfg.fixed_isn = isn;
+            cfg.rt_timeout = rto;
 
-        //     TCPSenderTestHarness test{"Don't add FIN if this would make the segment exceed the receiver's window", cfg};
-        //     test.execute(ExpectSegment{}.with_no_flags().with_syn(true).with_payload_size(0).with_seqno(isn));
-        //     test.execute(WriteBytes("abc").with_end_input(true));
-        //     test.execute(AckReceived{WrappingInt32{isn + 1}}.with_win(3));
-        //     test.execute(ExpectState{TCPSenderStateSummary::SYN_ACKED});
-        //     test.execute(ExpectSegment{}.with_payload_size(3).with_data("abc").with_seqno(isn + 1).with_no_flags());
-        //     test.execute(AckReceived{WrappingInt32{isn + 2}}.with_win(2));
-        //     test.execute(ExpectNoSegment{});
-        //     test.execute(AckReceived{WrappingInt32{isn + 3}}.with_win(1));
-        //     test.execute(ExpectNoSegment{});
-        //     test.execute(AckReceived{WrappingInt32{isn + 4}}.with_win(1));
-        //     test.execute(ExpectSegment{}.with_payload_size(0).with_seqno(isn + 4).with_fin(true));
-        // }  // failed
+            TCPSenderTestHarness test{"Don't add FIN if this would make the segment exceed the receiver's window", cfg};
+            test.execute(ExpectSegment{}.with_no_flags().with_syn(true).with_payload_size(0).with_seqno(isn));
+            test.execute(WriteBytes("abc").with_end_input(true));
+            test.execute(ExpectNoSegment{}); 
+            test.execute(AckReceived{WrappingInt32{isn + 1}}.with_win(3));
+            test.execute(ExpectState{TCPSenderStateSummary::SYN_ACKED});
+            test.execute(ExpectSegment{}.with_payload_size(3).with_data("abc").with_seqno(isn + 1).with_no_flags());
+            test.execute(AckReceived{WrappingInt32{isn + 2}}.with_win(2));
+            test.execute(ExpectNoSegment{});
+            test.execute(AckReceived{WrappingInt32{isn + 3}}.with_win(1));
+            test.execute(ExpectNoSegment{});
+            test.execute(AckReceived{WrappingInt32{isn + 4}}.with_win(1));
+            test.execute(ExpectSegment{}.with_payload_size(0).with_seqno(isn + 4).with_fin(true));
+        } 
 
-       /* {
+        {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
             const size_t rto = uniform_int_distribution<uint16_t>{30, 10000}(rd);
@@ -273,7 +273,7 @@ int main() {
             test.execute(ExpectNoSegment{});
             test.execute(AckReceived{WrappingInt32{isn + 4}}.with_win(1));
             test.execute(ExpectSegment{}.with_payload_size(0).with_seqno(isn + 4).with_fin(true));
-        }*/ //failed
+        } 
 
         {
             TCPConfig cfg;
@@ -302,7 +302,7 @@ int main() {
             test.execute(ExpectState{TCPSenderStateSummary::FIN_ACKED});
         }
 
-        /*{
+        {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
             const size_t rto = uniform_int_distribution<uint16_t>{30, 10000}(rd);
@@ -356,9 +356,9 @@ int main() {
                 test.execute(Tick{1});
                 test.execute(ExpectSegment{}.with_payload_size(0).with_data("").with_seqno(isn + 4).with_fin(true));
             }
-        }*/   //failed
+        }  
 
-       /* {
+        {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
             const size_t rto = uniform_int_distribution<uint16_t>{30, 10000}(rd);
@@ -392,7 +392,7 @@ int main() {
 
             test.execute(AckReceived{WrappingInt32{isn + 2}}.with_win(3));
             test.execute(ExpectSegment{}.with_payload_size(2).with_data("bc").with_seqno(isn + 2).with_fin(true));
-        }*/ //failed
+        } 
 
         {
             TCPConfig cfg;

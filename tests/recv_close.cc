@@ -34,6 +34,7 @@ int main() {
             TCPReceiverTestHarness test{4000};
             test.execute(ExpectState{TCPReceiverStateSummary::LISTEN});
             test.execute(SegmentArrives{}.with_syn().with_seqno(isn + 0).with_result(SegmentArrives::Result::OK));
+            test.execute(ExpectAckno{WrappingInt32{isn + 1}});
             test.execute(ExpectState{TCPReceiverStateSummary::SYN_RECV});
             test.execute(
                 SegmentArrives{}.with_fin().with_seqno(isn + 1).with_data("a").with_result(SegmentArrives::Result::OK));

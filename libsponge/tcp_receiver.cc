@@ -15,17 +15,18 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
     const string &data{seg.payload().str().begin(), seg.payload().str().end()};
     const uint64_t mod = static_cast<uint64_t>(1) << 32;
 
-    if (head.syn) {
+    if (head.syn && !has_isn) {
         has_isn = true;
         isn = head.seqno;
     }
 
-    if (head.fin) {
+    if (head.fin && !has_fin) {
         has_fin = true;
-        uint32_t add = data.size();
-        if (head.syn)
-            add++;
-        fin = WrappingInt32((head.seqno.raw_value() + add) % mod);
+        // uint32_t add = data.size();
+        // if (head.syn)
+        //     add++;
+        // fin = WrappingInt32((head.seqno.raw_value() + add) % mod);
+        fin = WrappingInt32((head.seqno.raw_value() + seg.length_in_sequence_space() - 1) % mod);
     }
 
     uint64_t absSeqno = unwrap(head.seqno, isn, _reassembler.stream_out().bytes_written());
@@ -36,13 +37,14 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
     return;
 }
 
-optional<WrappingInt32> TCPReceiver::ackno() const {
-    if (has_isn == false) {  // syn not received
+std::optional<WrappingInt32> TCPReceiver::ackno() const {
+    if (has_isn == false) {  // syn not received Listen
         return {};
     }
     if (has_fin && _reassembler.stream_out().input_ended()) {
         return fin + 1;  // fin seqno received, and input has ended, so return fin + 1
-    }
+    } // ended
+    // ongoing
     uint64_t stream_index = _reassembler.stream_out().bytes_written();
     WrappingInt32 ack = wrap(stream_index + 1, isn);
     return ack;

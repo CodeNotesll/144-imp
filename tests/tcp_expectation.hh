@@ -5,7 +5,7 @@
 #include "tcp_expectation_forward.hh"
 #include "tcp_fsm_test_harness.hh"
 #include "tcp_state.hh"
-
+#include<iostream>
 #include <algorithm>
 #include <cstdint>
 #include <exception>
@@ -546,7 +546,9 @@ struct Tick : public TCPAction {
         return o.str();
     }
 
-    void execute(TCPTestHarness &harness) const { harness._fsm.tick(ms_since_last_tick); }
+    void execute(TCPTestHarness &harness) const { 
+        harness._fsm.tick(ms_since_last_tick); 
+    }
 };
 
 struct Connect : public TCPAction {

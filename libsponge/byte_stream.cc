@@ -31,7 +31,7 @@ size_t ByteStream::write(const string &data) {
 
 //! \param[in] len bytes will be copied from the output side of the buffer
 string ByteStream::peek_output(const size_t len) const {
-    std::queue<char> new_copy = std::move(que);
+    std::queue<char> new_copy = que;
     size_t to_peek = min(len, new_copy.size());
     string ans;
     while (to_peek) {
