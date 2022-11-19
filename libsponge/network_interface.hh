@@ -7,7 +7,8 @@
 
 #include <optional>
 #include <queue>
-
+#include <map>
+#include <vector>
 //! \brief A "network interface" that connects IP (the internet layer, or network layer)
 //! with Ethernet (the network access layer, or link layer).
 
@@ -40,6 +41,22 @@ class NetworkInterface {
     //! outbound queue of Ethernet frames that the NetworkInterface wants sent
     std::queue<EthernetFrame> _frames_out{};
 
+    //! remembered next hop's ip addr mapping --> EthernetAddress 
+    std::map<uint32_t, EthernetAddress> addr_mp{};
+    //! time kept --> the ip addr 
+    std::map<size_t, uint32_t> kept_time_ip{};
+
+
+    //! next hop's ip addr that has been requested about --> time 
+    std::map<uint32_t, size_t> request_mp{};
+    //! next hop's addr --> the datagram to be sent 
+    std::map<uint32_t, std::queue<InternetDatagram>> kept_ip_datagram{};
+
+    //! in mileseconds
+    size_t cur_time{};        
+
+    static constexpr size_t request_wait_time = 5000;  
+    static constexpr size_t map_keep_time = 30000;
   public:
     //! \brief Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer) addresses
     NetworkInterface(const EthernetAddress &ethernet_address, const Address &ip_address);
@@ -63,5 +80,5 @@ class NetworkInterface {
     //! \brief Called periodically when time elapses
     void tick(const size_t ms_since_last_tick);
 };
-
+//#include<network_interface.cc>
 #endif  // SPONGE_LIBSPONGE_NETWORK_INTERFACE_HH
