@@ -85,17 +85,24 @@ optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &fra
         }
         // learn sender's mappings from both requests and replies
         addr_mp[arp.sender_ip_address] = arp.sender_ethernet_address;
-        kept_time_ip[cur_time] = arp.sender_ip_address;
+        kept_time_ip[cur_time].push_back(arp.sender_ip_address);
 
-        // requested arq message got reply
-        if (arp.opcode == ARPMessage::OPCODE_REPLY && arp.target_ip_address == _ip_address.ipv4_numeric()) {
-            request_mp.erase(arp.sender_ip_address);
-            while (kept_ip_datagram[arp.sender_ip_address].empty() == false) {
-                InternetDatagram datagram = kept_ip_datagram[arp.sender_ip_address].front();
-                kept_ip_datagram[arp.sender_ip_address].pop();
-                send_datagram(datagram, Address::from_ipv4_numeric(arp.sender_ip_address));
-            }
-            kept_ip_datagram.erase(arp.sender_ip_address);
+        if (arp.opcode == ARPMessage::OPCODE_REPLY) {
+            addr_mp[arp.target_ip_address] = arp.target_ethernet_address;
+            kept_time_ip[cur_time].push_back(arp.target_ip_address);
+            
+            // requested arq message got reply
+            if (arp.target_ip_address == _ip_address.ipv4_numeric()) {
+                request_mp.erase(arp.sender_ip_address);
+        // arp.sender_ip_address is the next_hop's address requested before 
+        // kept_ip_datagram[arp.sender_ip_address] is the datagram sent to arp.sender_ip_address
+                while (kept_ip_datagram[arp.sender_ip_address].empty() == false) {
+                    InternetDatagram datagram = kept_ip_datagram[arp.sender_ip_address].front();
+                    kept_ip_datagram[arp.sender_ip_address].pop();
+                    send_datagram(datagram, Address::from_ipv4_numeric(arp.sender_ip_address));
+                }
+                kept_ip_datagram.erase(arp.sender_ip_address);
+            } 
         }
         // an ARP request asking for our IP address
         if (arp.opcode == ARPMessage::OPCODE_REQUEST && arp.target_ip_address == _ip_address.ipv4_numeric()) {
@@ -125,11 +132,12 @@ void NetworkInterface::tick(const size_t ms_since_last_tick) {
     // erase IP-to-Ethernet Mapping that have expired
     auto it = kept_time_ip.begin();
     while (it != kept_time_ip.end()) {
-        const auto& [time, ip] = *it;
+        size_t time = it->first;
         if (time + map_keep_time > cur_time) {
             break;
         } else {  // time + map_keep_time <= cur_time
-            addr_mp.erase(ip);
+            for(const auto& ip : it->second) // kept_time_ip(time)
+                addr_mp.erase(ip);
             it = kept_time_ip.erase(it);  // it points to next pair
         }
     }

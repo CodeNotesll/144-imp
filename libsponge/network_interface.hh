@@ -44,7 +44,7 @@ class NetworkInterface {
     //! remembered next hop's ip addr mapping --> EthernetAddress 
     std::map<uint32_t, EthernetAddress> addr_mp{};
     //! time kept --> the ip addr 
-    std::map<size_t, uint32_t> kept_time_ip{};
+    std::map<size_t, std::vector<uint32_t>> kept_time_ip{};
 
 
     //! next hop's ip addr that has been requested about --> time 
