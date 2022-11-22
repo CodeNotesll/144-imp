@@ -5,7 +5,8 @@
 
 #include <optional>
 #include <queue>
-
+#include <map>
+#include <tuple>
 //! \brief A wrapper for NetworkInterface that makes the host-side
 //! interface asynchronous: instead of returning received datagrams
 //! immediately (from the `recv_frame` method), it stores them for
@@ -29,7 +30,7 @@ class AsyncNetworkInterface : public NetworkInterface {
     //! \param[in] frame the incoming Ethernet frame
     void recv_frame(const EthernetFrame &frame) {
         auto optional_dgram = NetworkInterface::recv_frame(frame);
-        if (optional_dgram.has_value()) {
+        if (optional_dgram.has_value()) { // IPV4 datagram
             _datagrams_out.push(std::move(optional_dgram.value()));
         }
     };
@@ -41,6 +42,7 @@ class AsyncNetworkInterface : public NetworkInterface {
 //! \brief A router that has multiple network interfaces and
 //! performs longest-prefix-match routing between them.
 class Router {
+    // private member:
     //! The router's collection of network interfaces
     std::vector<AsyncNetworkInterface> _interfaces{};
 
@@ -49,6 +51,9 @@ class Router {
     //! datagram's destination address.
     void route_one_datagram(InternetDatagram &dgram);
 
+    // forwarding table  
+    using tp = std::tuple<uint32_t, uint8_t, std::optional<Address>, size_t>;
+    std::vector<tp> route_table{};
   public:
     //! Add an interface to the router
     //! \param[in] interface an already-constructed network interface
@@ -59,6 +64,7 @@ class Router {
     }
 
     //! Access an interface by index
+    // at() access method will throw error if out of index 
     AsyncNetworkInterface &interface(const size_t N) { return _interfaces.at(N); }
 
     //! Add a route (a forwarding rule)
