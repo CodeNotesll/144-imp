@@ -30,9 +30,9 @@ InternetDatagram make_datagram(const string &src_ip, const string &dst_ip) {
 
 ARPMessage make_arp(const uint16_t opcode,
                     const EthernetAddress sender_ethernet_address,
-                    const string sender_ip_address,
+                    const string& sender_ip_address,
                     const EthernetAddress target_ethernet_address,
-                    const string target_ip_address) {
+                    const string& target_ip_address) {
     ARPMessage arp;
     arp.opcode = opcode;
     arp.sender_ethernet_address = sender_ethernet_address;
@@ -45,7 +45,7 @@ ARPMessage make_arp(const uint16_t opcode,
 EthernetFrame make_frame(const EthernetAddress &src,
                          const EthernetAddress &dst,
                          const uint16_t type,
-                         const BufferList payload) {
+                         const BufferList& payload) {
     EthernetFrame frame;
     frame.header().src = src;
     frame.header().dst = dst;

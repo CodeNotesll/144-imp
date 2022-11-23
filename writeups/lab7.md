@@ -1,9 +1,9 @@
 Lab 7 Writeup
 =============
 
-My name: [your name here]
+My name: [Leslie ]
 
-My SUNet ID: [your sunetid here]
+My SUNet ID: [2101213213]
 
 My lab partner's SUNet ID: [your sunetid here]
 
