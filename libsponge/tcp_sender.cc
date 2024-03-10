@@ -92,7 +92,7 @@ void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
     }
 
     rwnd = window_size;  
-    wait_time = _initial_retransmission_timeout;
+    wait_time = _initial_retransmission_timeout;  // 收到了ack，重置拥塞控制信息
     consecutive_retransmission_num = 0;
 
     while (!_outstanding_seg.empty()) {

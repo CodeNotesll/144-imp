@@ -30,7 +30,7 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
     }
 
     uint64_t absSeqno = unwrap(head.seqno, isn, _reassembler.stream_out().bytes_written());
-    if (head.syn)
+    if (head.syn)  // ?????
         _reassembler.push_substring(data, absSeqno, head.fin);
     else
         _reassembler.push_substring(data, absSeqno - 1, head.fin);
@@ -49,5 +49,8 @@ std::optional<WrappingInt32> TCPReceiver::ackno() const {
     WrappingInt32 ack = wrap(stream_index + 1, isn);
     return ack;
 }
+
+// 窗口大小：byte_stream容量 - 缓冲区中还有的字节数量(还没有被读取)
+// 
 
 size_t TCPReceiver::window_size() const { return _reassembler.stream_out().remaining_capacity(); }

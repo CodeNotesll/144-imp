@@ -35,14 +35,17 @@ void TCPConnection::send_rst(){
     while (!_sender.segments_out().empty()) {
         _sender.segments_out().pop();
     }
+
     _sender.send_empty_segment();
     TCPSegment _seg = _sender.segments_out().front();
     _sender.segments_out().pop();
+
     if (_receiver.ackno().has_value()) {
         _seg.header().ack = true;
         _seg.header().ackno = _receiver.ackno().value();
     }
     _seg.header().win = _receiver.window_size();
+    
     _seg.header().rst = true;
     _segments_out.push(_seg);  
     return;
@@ -52,11 +55,13 @@ void TCPConnection::send_all_segments() {
     while (!_sender.segments_out().empty()) {
         TCPSegment _seg = _sender.segments_out().front();
         _sender.segments_out().pop();
-        if (_receiver.ackno().has_value()) {
+
+        if (_receiver.ackno().has_value()) {  // receiver 提供ackno和window size 
             _seg.header().ack = true;
             _seg.header().ackno = _receiver.ackno().value();
         }
         _seg.header().win = _receiver.window_size();
+
         _segments_out.push(_seg);
     }
     return;
